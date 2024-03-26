@@ -1,38 +1,44 @@
-# PROGRAMA
-    PROG = perfSL
-    OBJS = main.o mod1.o mod2.o mod3.o utils.o
+# Variáveis
+CC = gcc
+CFLAGS = -O0 
+LFLAGS = -lm
 
-# Compilador
-    CC     = gcc
+# Diretórios
+SRC_DIR = src
 
-# Acrescentar onde apropriado as opções para incluir uso da biblioteca LIKWID
-    CFLAGS = -O0
-    LFLAGS = -lm
-
-# Lista de arquivos para distribuição
-DISTFILES = *.c *.h LEIAME* Makefile
+DISTFILES = SRC_DIR LEIAME* Makefile
 DISTDIR = `basename ${PWD}`
 
-.PHONY: all clean purge dist
+OBJ_DIR = obj
 
-%.o: %.c %.h
-	$(CC) -c $(CFLAGS) -o $@ $<
+# Arquivos fonte
+SRC_FILES = $(wildcard $(SRC_DIR)/*.c)
+OBJ_FILES = $(patsubst $(SRC_DIR)/%.c, $(OBJ_DIR)/%.o, $(SRC_FILES))
 
-all: $(PROG)
+# Nome do executável
+EXECUTABLE = perfSL 
+# Regras
+all: $(EXECUTABLE)
 
-$(PROG): $(OBJS)
-	$(CC) $(CFLAGS) -o $@ $^ $(LFLAGS)
+$(EXECUTABLE): $(OBJ_FILES)
+	$(CC) $(CFLAGS) $^ -o $@
+
+$(OBJ_DIR)/%.o: $(SRC_DIR)/%.c
+	@mkdir -p $(OBJ_DIR)
+	$(CC) $(CFLAGS) -c $< -o $@
 
 clean:
 	@echo "Limpando sujeira ..."
-	@rm -f *~ *.bak
+	rm -f $(OBJ_DIR)/*.o $(EXECUTABLE) 
 
-purge:  clean
+purge : clean
 	@echo "Limpando tudo ..."
-	@rm -f $(PROG) $(OBJS) core a.out $(DISTDIR) $(DISTDIR).tar
+	rm -f $(EXECUTABLE) $(DISTDIR) $(DISTDIR).tar
 
 dist: purge
 	@echo "Gerando arquivo de distribuição ($(DISTDIR).tar) ..."
 	@ln -s . $(DISTDIR)
 	@tar -cvf $(DISTDIR).tar $(addprefix ./$(DISTDIR)/, $(DISTFILES))
 	@rm -f $(DISTDIR)
+
+.PHONY: all clean purge dist

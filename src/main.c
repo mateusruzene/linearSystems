@@ -1,8 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
-#include "eliminacaoGauss.h"
-#include "gaussSeidel.h"
+#include "gauss-elimination.h"
+#include "gauss-seidel.h"
 
 #include "utils.h"
 
@@ -85,11 +85,11 @@ int main(){
   double **A2 = malloc(n*sizeof(double*));
   double *b2 = malloc(n*sizeof(double));
 
-  alocmatriz(A2, n);
+  alocaMatriz(A2, n);
 
   //Realiza a eliminacao de gauss clássica
   leSistemaLinear(A, b, n);
-  eliminacaoGauss(A, b, n);
+  gaussElimination(A, b, n);
   imprimeMatriz(A, n);
   imprimeVetor(b, n);
 
