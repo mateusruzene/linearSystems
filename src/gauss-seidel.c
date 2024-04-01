@@ -2,15 +2,22 @@
 #include <stdlib.h>
 #include <math.h>
 
+double calculatesError(double *x, double *x0, int n, double max){
+  for(int i=0;i<n;i++){
+    if(fabs(x[i] - x0[i]) > max)
+      max = fabs(x[i] - x0[i]);
+  }
+  return max;
+}
 /* Function:  gaussSeidel
  * --------------------
  *  Resolve um sistema linear utilizando o método de Gauss-Seidel
  */
-int gaussSeidel(double**A, double *b, double *x, int n, double tol, int maxIter){
-  int i, j;
-  double *x0;
-  double sum;
-  double diff;
+int gaussSeidel(double**A, double *b, double *x, int n, double tol){
+  int j;
+  double error = 1.0 + tol;
+  double *x0, sum;
+  double max = 0.0;
   int iter;
 
   if(!(x0 = malloc(n*sizeof(double)))){
@@ -18,33 +25,43 @@ int gaussSeidel(double**A, double *b, double *x, int n, double tol, int maxIter)
     return 1;
   }
 
-  for(i=0; i<n; i++)
+  for(int i=0; i<n; i++)
     x0[i] = x[i];
 
-  for(iter=0; iter<maxIter; iter++){
-    for(i=0; i<n; i++){
+  while(error < tol){
+    for(int i=0; i<n; i++){
       sum = 0.0;
       for(j=0; j<n; j++){
-        if(j!=i)
-          sum += A[i][j]*x[j];
+        if(j!=i) sum += A[i][j]*x[j];
       }
       x[i] = (b[i] - sum)/A[i][i];
     }
 
-    diff = 0.0;
-    for(i=0; i<n; i++)
-      diff += fabs(x[i] - x0[i]);
+    max = calculatesError(x, x0, n, max);
 
-    if(diff < tol){
+    if(max < tol){
       free(x0);
       return 0;
     }
 
-    for(i=0; i<n; i++)
+    for(int i=0; i<n; i++)
       x0[i] = x[i];
   }
 
   free(x0);
   return 1;
 
+}
+
+double gaussSeidelResidue(double **A, double *b, double *x, int n){
+  double residue = 0.0;
+  double sum;
+  for(int i=0; i<n; i++){
+    sum = 0.0;
+    for(int j=0; j<n; j++){
+      sum += A[i][j]*x[j];
+    }
+    residue += fabs(b[i] - sum);
+  }
+  return residue;
 }

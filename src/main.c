@@ -22,7 +22,6 @@ int leSistemaLinear(double **A, double *b, int n){
   int i, j;
 
   for (i=0;i<n; i++){
-    printf("Digite a linha %d da matriz A\n", i);
     for(j=0; j<n; j++){
       printf("A[%d][%d]: ", i, j);
 
@@ -31,7 +30,6 @@ int leSistemaLinear(double **A, double *b, int n){
         return 1;
       }
     }
-    printf("Digite o valor de b[%d]: ", i);
     if(!(scanf("%lf", &b[i]))){
       printf("Erro na leitura do vetor b\n");
       return 1;
@@ -67,40 +65,57 @@ void imprimeMatriz(double **A, int n){
 
 void imprimeVetor(double *b, int n){
   for(int i=0; i<n; i++){
-    printf("%lf\n", b[i]);
+    printf("%lf ", b[i]);
+  }
+}
+
+void copiesMatrix(double **A, double **B, int n){
+  for(int i=0; i<n; i++){
+    for(int j=0; j<n; j++){
+      B[i][j] = A[i][j];
+    }
   }
 }
 
 int main(){
 
   int n;
-  printf("Digite a ordem da matriz: ");
+  double residue, tol;
   scanf("%d", &n);
 
   double **A = malloc(n*sizeof(double*));
+  double **aux = malloc(n*sizeof(double*));
   double *b = malloc(n*sizeof(double));
+  double *x = malloc(n*sizeof(double));
 
   alocaMatriz(A, n);
+  leSistemaLinear(aux, b, n);
 
-  double **A2 = malloc(n*sizeof(double*));
-  double *b2 = malloc(n*sizeof(double));
+  //Realiza a eliminacao de gauss clássica com pivoteamento
+  copiesMatrix(aux, A, n);
+  printf("EG Clássico:\n");
+  gaussElimination(A, b, x, n);
+  printf("\n");
+  imprimeVetor(x, n);
+  residue = gaussEliminationResidue(A, b, x, n);  
+  printf("Residuo: %lf\n", residue);
 
-  alocaMatriz(A2, n);
+  //Realiza o metodo de gauss-seidel
+  copiesMatrix(aux, A, n);
+  printf("GS Clássico:\n");
+  gaussSeidel(A, b, x, n, tol);
+  printf("\n");
+  imprimeVetor(x, n);
+  residue = gaussSeidelResidue(A, b, x, n);
 
-  //Realiza a eliminacao de gauss clássica
-  leSistemaLinear(A, b, n);
-  gaussElimination(A, b, n);
-  imprimeMatriz(A, n);
-  imprimeVetor(b, n);
+  //Realiza a eliminação de gauss em matriz tridiagonal
+  copiesMatrix(aux, A, n);
+  printf("EG Tridiagonal:\n");
 
-  //Realiza Gauss-Seidel clássica
-  leSistemaLinear(A2, b2, n);
-  gaussSeidel(A2, b2, b2, n, 1e-6, 1000);
-  imprimeMatriz(A2, n);
-  imprimeVetor(b2, n);
+  //Realiza o metodo de gauss-seidel em matriz tridiagonal
+  
 
   liberaMatriz(A, n);
-  liberaMatriz(A2, n);
 
   return 1;
 }

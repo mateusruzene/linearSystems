@@ -34,9 +34,10 @@ void lineSwap(double **A, double *b, int n, int i){
 /*
  *  A: matrix of n elements
  *  b: array of n elements
- *  n: ordem da matriz
+ *  n: matrix order
+ *  x: result array of n elements
  */
-void gaussElimination(double **A, double *b, int n){
+void gaussElimination(double **A, double *b, double *x, int n){
   double m;
 
   //0 --> n-1 loops
@@ -56,6 +57,14 @@ void gaussElimination(double **A, double *b, int n){
       //1 subtraction and 1 product
       b[k] -= m*b[i];
     }
+      // Back substitution
+  for (int i = n - 1; i >= 0; i--) {
+    x[i] = b[i];
+    for (int j = i + 1; j < n; j++) {
+      x[i] -= A[i][j] * x[j];
+    }
+    x[i] /= A[i][i];
+  }
   }
 }
 
@@ -68,5 +77,16 @@ void gaussElimination(double **A, double *b, int n){
 /*
  * Residuo é o quão distante a solução encontrada está da solução "exata"
  */
-double calculateResidue(double **A, double *b, double *x, int n){
+double gaussEliminationResidue(double **A, double *b, double *x, int n){
+  double residue = 0.0;
+  double sum;
+
+  for(int i=0; i<n; i++){
+    sum = 0.0;
+    for(int j=0; j<n; j++)
+      sum += A[i][j]*x[j];
+    residue += fabs(b[i] - sum);
+  }
+
+  return residue;
 }
