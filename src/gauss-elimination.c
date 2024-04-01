@@ -57,14 +57,14 @@ void gaussElimination(double **A, double *b, double *x, int n){
       //1 subtraction and 1 product
       b[k] -= m*b[i];
     }
-      // Back substitution
-  for (int i = n - 1; i >= 0; i--) {
-    x[i] = b[i];
-    for (int j = i + 1; j < n; j++) {
-      x[i] -= A[i][j] * x[j];
+    // Back substitution
+    for (int i = n - 1; i >= 0; i--) {
+      x[i] = b[i];
+      for (int j = i + 1; j < n; j++) {
+        x[i] -= A[i][j] * x[j];
+      }
+      x[i] /= A[i][i];
     }
-    x[i] /= A[i][i];
-  }
   }
 }
 
@@ -72,6 +72,29 @@ void gaussElimination(double **A, double *b, double *x, int n){
 // SOMATORIO EM QUE I=0 ATE N-1 DE (2i^2 + i - 4ni + 2n^2 - n - 1)
 //
 // 2n^3 + n^2/2 - 7n/6 FLOPs
+
+
+void gaussElimination3d(double *d, double *a, double*c, double*b, double *x, int n){
+  double m;
+
+  //0 --> n-1 loops
+  for(int i=0; i<n; i++){
+
+      //1 division
+      m = a[i]/d[i];
+      a[i] = 0.0;
+      
+      //(1 subtraction and 1 product) * 2
+      d[i+1] -= m*c[i];
+      b[i+1] -= m*b[i];
+    }
+
+  // Back substitution
+  x[n-1] = b[n-1] / d[n-1];
+  for (int i =n-2; i>0; i--) {
+    x[i] = (b[i] - c[i] * x[i+1]) / d[i];
+  }
+}
 
 
 /*

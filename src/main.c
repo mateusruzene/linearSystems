@@ -27,31 +27,30 @@ int leSistemaLinear(double **A, double *b, int n){
 
       if(!(scanf("%lf", &A[i][j]))){
         printf("Erro na leitura da matriz A\n");
-        return 1;
+        return 0;
       }
     }
     if(!(scanf("%lf", &b[i]))){
       printf("Erro na leitura do vetor b\n");
-      return 1;
+      return 0;
     }
   }
-  return 0;
+  return 1;
 }
 
 int alocaMatriz(double **A, int n){
   for(int i=0;i<n;i++){
     if(!(A[i] = malloc(n*sizeof(double)))){
       printf("Erro na alocação de memória\n");
-      return 1;
+      return 0;
     }
   }
-  return 0;
+  return 1;
 }
 
-int liberaMatriz(double **A, int n){
+void liberaMatriz(double **A, int n){
   for(int i=0;i<n;i++)
     free(A[i]);
-  return 0;
 }
 
 void imprimeMatriz(double **A, int n){
@@ -113,6 +112,8 @@ int main(){
   printf("EG Tridiagonal:\n");
 
   //Realiza o metodo de gauss-seidel em matriz tridiagonal
+  copiesMatrix(aux, A, n);
+  printf("GS Tridiagonal:\n");
   
 
   liberaMatriz(A, n);
