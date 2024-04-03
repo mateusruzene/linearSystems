@@ -91,15 +91,3 @@ int gaussSeidel3d(double*d, double *a, double* c, double *b, double *x, int n, d
 
 }
 
-double gaussSeidelResidue(double **A, double *b, double *x, int n){
-  double residue = 0.0;
-  double sum;
-  for(int i=0; i<n; i++){
-    sum = 0.0;
-    for(int j=0; j<n; j++){
-      sum += A[i][j]*x[j];
-    }
-    residue += fabs(b[i] - sum);
-  }
-  return residue;
-}
