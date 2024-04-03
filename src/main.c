@@ -23,7 +23,6 @@ int leSistemaLinear(double **A, double *b, int n){
 
   for (i=0;i<n; i++){
     for(j=0; j<n; j++){
-      printf("A[%d][%d]: ", i, j);
 
       if(!(scanf("%lf", &A[i][j]))){
         printf("Erro na leitura da matriz A\n");
@@ -66,6 +65,7 @@ void imprimeVetor(double *b, int n){
   for(int i=0; i<n; i++){
     printf("%lf ", b[i]);
   }
+  printf("\n");
 }
 
 void copiesMatrix(double **A, double **B, int n){
@@ -76,10 +76,37 @@ void copiesMatrix(double **A, double **B, int n){
   }
 }
 
+/*
+ * Residuo é o quão distante a solução encontrada está da solução "exata"
+ */
+double* CalculatesResidue(double **A, double *b, double *x, int n){
+  double* residue = (double*)malloc(n*sizeof(double));
+  double sum;
+
+  for(int i=0; i<n; i++){
+    sum = 0.0;
+    for(int j=0; j<n; j++)
+      sum += A[i][j]*x[j];
+    residue[i] += fabs(b[i] - sum);
+  }
+
+  return residue;
+}
+
+int isTridiagonal(double **A, int n){
+  for(int i=0; i<n; i++){
+    for(int j=0; j<n; j++){
+      if(i!=j && i!=j+1 && i!=j-1 && A[i][j] != 0)
+        return 0;
+    }
+  }
+  return 1;
+}
+
 int main(){
 
   int n;
-  double residue, tol;
+  double tol;
   scanf("%d", &n);
 
   double **A = malloc(n*sizeof(double*));
@@ -88,33 +115,54 @@ int main(){
   double *x = malloc(n*sizeof(double));
 
   alocaMatriz(A, n);
+  alocaMatriz(aux, n);
   leSistemaLinear(aux, b, n);
 
   //Realiza a eliminacao de gauss clássica com pivoteamento
   copiesMatrix(aux, A, n);
   printf("EG Clássico:\n");
   gaussElimination(A, b, x, n);
-  printf("\n");
   imprimeVetor(x, n);
-  residue = gaussEliminationResidue(A, b, x, n);  
-  printf("Residuo: %lf\n", residue);
+  imprimeVetor(CalculatesResidue(A, b, x, n), n);
 
   //Realiza o metodo de gauss-seidel
   copiesMatrix(aux, A, n);
   printf("GS Clássico:\n");
   gaussSeidel(A, b, x, n, tol);
-  printf("\n");
   imprimeVetor(x, n);
-  residue = gaussSeidelResidue(A, b, x, n);
+  imprimeVetor(CalculatesResidue(A, b, x, n), n);
 
-  //Realiza a eliminação de gauss em matriz tridiagonal
-  copiesMatrix(aux, A, n);
-  printf("EG Tridiagonal:\n");
+  if(isTridiagonal(A, n)){
+    double *a = malloc((n-1)*sizeof(double));
+    double *c = malloc((n-1)*sizeof(double));
+    double *d = malloc(n*sizeof(double));
 
-  //Realiza o metodo de gauss-seidel em matriz tridiagonal
-  copiesMatrix(aux, A, n);
-  printf("GS Tridiagonal:\n");
-  
+    for(int i=0; i<n; i++){
+      d[i] = A[i][i];
+      if(i<n-1)
+        c[i] = A[i][i+1];
+      if(i>0)
+        a[i-1] = A[i][i-1];
+    }
+
+    //Realiza a eliminação de gauss em matriz tridiagonal
+    copiesMatrix(aux, A, n);
+    printf("EG Tridiagonal:\n");
+    gaussElimination3d(d, a, c, b, x, n);
+    imprimeVetor(x, n);
+    imprimeVetor(CalculatesResidue(A, b, x, n), n);
+
+    //Realiza o metodo de gauss-seidel em matriz tridiagonal
+    copiesMatrix(aux, A, n);
+    printf("GS Tridiagonal:\n");
+    gaussSeidel3d(d, a, c, b, x, n);
+    imprimeVetor(x, n);
+    imprimeVetor(CalculatesResidue(A, b, x, n), n);
+
+    free(a);
+    free(c);
+    free(d);
+  }
 
   liberaMatriz(A, n);
 

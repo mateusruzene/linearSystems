@@ -95,21 +95,3 @@ void gaussElimination3d(double *d, double *a, double*c, double*b, double *x, int
     x[i] = (b[i] - c[i] * x[i+1]) / d[i];
   }
 }
-
-
-/*
- * Residuo é o quão distante a solução encontrada está da solução "exata"
- */
-double gaussEliminationResidue(double **A, double *b, double *x, int n){
-  double residue = 0.0;
-  double sum;
-
-  for(int i=0; i<n; i++){
-    sum = 0.0;
-    for(int j=0; j<n; j++)
-      sum += A[i][j]*x[j];
-    residue += fabs(b[i] - sum);
-  }
-
-  return residue;
-}
