@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <math.h>
 #include "gauss-elimination.h"
+//#include <likwid.h>
 
 /*
  * is used to prevent the pivot element from being zero
