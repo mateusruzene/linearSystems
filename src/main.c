@@ -3,6 +3,7 @@
 #include <math.h>
 #include "gauss-elimination.h"
 #include "gauss-seidel.h"
+//#include <likwid.h>
 
 #include "utils.h"
 
@@ -63,7 +64,7 @@ void imprimeMatriz(double **A, int n){
 
 void imprimeVetor(double *b, int n){
   for(int i=0; i<n; i++){
-    printf("%lf ", b[i]);
+    printf("%.12f ", b[i]);
   }
   printf("\n");
 }
@@ -79,14 +80,16 @@ void copiesMatrix(double **A, double **B, int n){
 /*
  * Residuo é o quão distante a solução encontrada está da solução "exata"
  */
-double* CalculatesResidue(double **A, double *b, double *x, int n){
+double* CalculatesResidual(double **A, double *b, double *x, int n){
   double* residue = (double*)malloc(n*sizeof(double));
   double sum;
 
   for(int i=0; i<n; i++){
     sum = 0.0;
+
     for(int j=0; j<n; j++)
       sum += A[i][j]*x[j];
+
     residue[i] += fabs(b[i] - sum);
   }
 
@@ -123,48 +126,48 @@ int main(){
   printf("EG Clássico:\n");
   gaussElimination(A, b, x, n);
   imprimeVetor(x, n);
-  imprimeVetor(CalculatesResidue(A, b, x, n), n);
+  imprimeVetor(CalculatesResidual(A, b, x, n), n);
 
   //Realiza o metodo de gauss-seidel
   copiesMatrix(aux, A, n);
   printf("GS Clássico:\n");
   gaussSeidel(A, b, x, n, tol);
   imprimeVetor(x, n);
-  imprimeVetor(CalculatesResidue(A, b, x, n), n);
+ 
+  imprimeVetor(CalculatesResidual(A, b, x, n), n);
 
-  if(isTridiagonal(A, n)){
-    double *a = malloc((n-1)*sizeof(double));
-    double *c = malloc((n-1)*sizeof(double));
-    double *d = malloc(n*sizeof(double));
+  double *a = malloc((n-1)*sizeof(double));
+  double *c = malloc((n-1)*sizeof(double));
+  double *d = malloc(n*sizeof(double));
 
-    for(int i=0; i<n; i++){
-      d[i] = A[i][i];
-      if(i<n-1)
-        c[i] = A[i][i+1];
-      if(i>0)
-        a[i-1] = A[i][i-1];
-    }
-
-    //Realiza a eliminação de gauss em matriz tridiagonal
-    copiesMatrix(aux, A, n);
-    printf("EG Tridiagonal:\n");
-    gaussElimination3d(d, a, c, b, x, n);
-    imprimeVetor(x, n);
-    imprimeVetor(CalculatesResidue(A, b, x, n), n);
-
-    //Realiza o metodo de gauss-seidel em matriz tridiagonal
-    copiesMatrix(aux, A, n);
-    printf("GS Tridiagonal:\n");
-    gaussSeidel3d(d, a, c, b, x, n);
-    imprimeVetor(x, n);
-    imprimeVetor(CalculatesResidue(A, b, x, n), n);
-
-    free(a);
-    free(c);
-    free(d);
+  for(int i=0; i<n; i++){
+    d[i] = A[i][i];
+    if(i<n-1)
+      c[i] = A[i][i+1];
+    if(i>0)
+      a[i-1] = A[i][i-1];
   }
 
+  //Realiza a eliminação de gauss em matriz tridiagonal
+  copiesMatrix(aux, A, n);
+  printf("EG Tridiagonal:\n");
+  gaussElimination3d(d, a, c, b, x, n);
+
+  imprimeVetor(x, n);
+  imprimeVetor(CalculatesResidual(A, b, x, n), n);
+
+  //Realiza o metodo de gauss-seidel em matriz tridiagonal
+  copiesMatrix(aux, A, n);
+  printf("GS Tridiagonal:\n");
+  gaussSeidel3d(d, a, c, b, x, n);
+  imprimeVetor(x, n);
+  imprimeVetor(CalculatesResidual(A, b, x, n), n);
+  
   liberaMatriz(A, n);
+  liberaMatriz(aux, n);
+  free(b);
+  free(x);
+  free(a);
 
   return 1;
 }

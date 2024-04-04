@@ -1,6 +1,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
+//#include <likwid.h>
+
+#define MAX_ITER 50
 
 double calculatesError(double *x, double *x0, int n, double max){
   for(int i=0;i<n;i++){
@@ -28,7 +31,7 @@ int gaussSeidel(double**A, double *b, double *x, int n, double tol){
   for(int i=0; i<n; i++)
     x0[i] = x[i];
 
-  while(error < tol){
+  while(error < tol && iter < MAX_ITER){
     for(int i=0; i<n; i++){
       sum = 0.0;
       for(j=0; j<n; j++){
@@ -46,6 +49,8 @@ int gaussSeidel(double**A, double *b, double *x, int n, double tol){
 
     for(int i=0; i<n; i++)
       x0[i] = x[i];
+
+    iter++;
   }
 
   free(x0);
