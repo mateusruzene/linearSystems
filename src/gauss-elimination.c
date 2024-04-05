@@ -79,7 +79,7 @@ void gaussElimination3d(double *d, double *a, double*c, double*b, double *x, int
   double m;
 
   //0 --> n-1 loops
-  for(int i=0; i<n; i++){
+  for(int i=0; i<n-1; i++){
 
       //1 division
       m = a[i]/d[i];
@@ -92,7 +92,7 @@ void gaussElimination3d(double *d, double *a, double*c, double*b, double *x, int
 
   // Back substitution
   x[n-1] = b[n-1] / d[n-1];
-  for (int i =n-2; i>0; i--) {
+  for (int i =n-2; i>=0; i--) {
     x[i] = (b[i] - c[i] * x[i+1]) / d[i];
   }
 }
