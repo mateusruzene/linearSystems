@@ -1,3 +1,4 @@
+/* Bruno Crestani GRR:20221240 - Mateus Ruzene GRR:20221223 */
 #ifndef __CORE_FUNCTIONS__
 #define __CORE_FUNCTIONS__
 

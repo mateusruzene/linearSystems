@@ -1,3 +1,4 @@
+/* Bruno Crestani GRR:20221240 - Mateus Ruzene GRR:20221223 */
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>

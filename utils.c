@@ -1,7 +1,6 @@
 #include <stdio.h>
 #include <string.h>
 #include <math.h>
-//#include <likwid.h>
 
 #include "utils.h"
 

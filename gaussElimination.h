@@ -1,3 +1,4 @@
+/* Bruno Crestani GRR:20221240 - Mateus Ruzene GRR:20221223 */
 #ifndef __GAUSS_ELIMINATION__
 #define __GAUSS_ELIMINATION__
 
