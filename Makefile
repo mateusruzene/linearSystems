@@ -1,44 +1,38 @@
-# Variáveis
-CC = gcc
-CFLAGS = -O0 
-LFLAGS = -lm
+# PROGRAMA
+    PROG = perfSL
+    OBJS = main.o gaussSeidel.o gaussElimination.o coreFunctions.o utils.o
 
-# Diretórios
-SRC_DIR = src
+# Compilador
+    CC     = gcc
 
-DISTFILES = SRC_DIR LEIAME* Makefile
+# Acrescentar onde apropriado as opções para incluir uso da biblioteca LIKWID
+    CFLAGS = -O0 -DLIKWID_PERFMON -I${LIKWID_INCLUDE}
+		LFLAGS = -lm -L${LIKWID_LIB} -llikwid
+
+# Lista de arquivos para distribuição
+DISTFILES = *.c *.h LEIAME* Makefile
 DISTDIR = `basename ${PWD}`
 
-OBJ_DIR = obj
+.PHONY: all clean purge dist
 
-# Arquivos fonte
-SRC_FILES = $(wildcard $(SRC_DIR)/*.c)
-OBJ_FILES = $(patsubst $(SRC_DIR)/%.c, $(OBJ_DIR)/%.o, $(SRC_FILES))
+%.o: %.c %.h
+	$(CC) -c $(CFLAGS) -o $@ $<
 
-# Nome do executável
-EXECUTABLE = perfSL 
-# Regras
-all: $(EXECUTABLE)
+all: $(PROG)
 
-$(EXECUTABLE): $(OBJ_FILES)
-	$(CC) $(CFLAGS) $^ -o $@
-
-$(OBJ_DIR)/%.o: $(SRC_DIR)/%.c
-	@mkdir -p $(OBJ_DIR)
-	$(CC) $(CFLAGS) -c $< -o $@
+$(PROG): $(OBJS)
+	$(CC) $(CFLAGS) -o $@ $^ $(LFLAGS)
 
 clean:
 	@echo "Limpando sujeira ..."
-	rm -f $(OBJ_DIR)/*.o $(EXECUTABLE) 
+	@rm -f *~ *.bak
 
-purge : clean
+purge:  clean
 	@echo "Limpando tudo ..."
-	rm -f $(EXECUTABLE) $(DISTDIR) $(DISTDIR).tar
+	@rm -f $(PROG) $(OBJS) core a.out $(DISTDIR) $(DISTDIR).tar
 
 dist: purge
 	@echo "Gerando arquivo de distribuição ($(DISTDIR).tar) ..."
 	@ln -s . $(DISTDIR)
 	@tar -cvf $(DISTDIR).tar $(addprefix ./$(DISTDIR)/, $(DISTFILES))
 	@rm -f $(DISTDIR)
-
-.PHONY: all clean purge dist
